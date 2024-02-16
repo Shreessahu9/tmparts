@@ -1,1 +1,62 @@
 
+<!-- Inside your HTML file or a separate script file -->
+<body>
+    <h1>Welcome to Machine Parts Portal</h1>
+
+    <div>
+        <label for="machineDropdown">Select Machine:</label>
+        <select id="machineDropdown"></select>
+
+        <label for="categoryDropdown">Select Part Category:</label>
+        <select id="categoryDropdown"></select>
+
+        <button onclick="fetchPartsForMachineAndCategory()">Fetch Parts</button>
+    </div>
+
+    <div id="machineWiseResults"></div>
+</body>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Populate machine dropdown on page load
+        fetch('/machines')
+            .then(response => response.json())
+            .then(data => {
+                const machineDropdown = document.getElementById('machineDropdown');
+                data.machines.forEach(machine => {
+                    const option = document.createElement('option');
+                    option.value = machine;
+                    option.text = machine;
+                    machineDropdown.add(option);
+                });
+            });
+
+        // Populate part subcategory dropdown on page load
+        fetch('/categories')
+            .then(response => response.json())
+            .then(data => {
+                const categoryDropdown = document.getElementById('categoryDropdown');
+                data.categories.forEach(category => {
+                    const option = document.createElement('option');
+                    option.value = category;
+                    option.text = category;
+                    categoryDropdown.add(option);
+                });
+            });
+    });
+
+    function fetchPartsForMachineAndCategory() {
+        const selectedMachine = document.getElementById('machineDropdown').value;
+        const selectedCategory = document.getElementById('categoryDropdown').value;
+
+        fetch(/parts/${selectedMachine}/${selectedCategory})
+            .then(response => response.json())
+            .then(data => {
+                const machineWiseResults = document.getElementById('machineWiseResults');
+                machineWiseResults.innerHTML = <h3>Parts for ${selectedMachine} in Category ${selectedCategory}:</h3>;
+                data.parts.forEach(part => {
+                    machineWiseResults.innerHTML += <p>${part}</p>;
+                });
+            })
+            .catch(error => console.error('Error:', error));
+    }
+</script>
